@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="author" content="Michael Barlow" />
+    <meta
+      name="description"
+      content="Generate 3D-printable topographic models"
+    />
+
+    <title>3D Topography</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="js/lib/geotiff.js/geotiff.min.js"></script>
+    <script src="js/lib/three.js/three.min.js"></script>
+    <script src="js/lib/three.js/orbitControls.min.js"></script>
+    <script src="js/lib/openLayers/openLayers.min.js"></script>
+    <link href="js/lib/openLayers/openLayers.css" rel="stylesheet" />
+
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <header>
+        <span>Please enable JavaScript to view this site in full.</span>
+      </header>
+    </noscript>
+    <header>
+      <h1>3D Topography</h1>
+      <nav>
+        <a href="./" class="selected">Home</a>
+        <a href="about">About</a>
+        <a href="https://github.com/Michael-JB/3d-topography/">GitHub</a>
+      </nav>
+      <hr />
+    </header>
+    <main>
+      <form id="data-source-form">
+        <h3>Data source</h3>
+        <p>
+          To generate a 3D model, specify your topography with the interactive
+          map, a WGS 84 bounding box or a GeoTIFF file.
+        </p>
+        <fieldset>
+          <div>
+            <input
+              type="radio"
+              id="map-radio-button"
+              name="source-select"
+              value="map"
+              required="required"
+              checked="checked"
+            />
+            <label for="map-radio-button">Generate from interactive map</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="bbox-radio-button"
+              name="source-select"
+              value="bbox"
+              required="required"
+            />
+            <label for="bbox-radio-button">Generate from bounding box</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="file-radio-button"
+              name="source-select"
+              value="file"
+              required="required"
+            />
+            <label for="file-radio-button">Generate from file</label>
+          </div>
+        </fieldset>
+        <fieldset id="map-fieldset">
+          <div id="map" class="map"></div>
+          <div id="map-bbox-details" class="detail-grid">
+            <label for="map-bbox-details-w">W:</label>
+            <p id="map-bbox-details-w">-</p>
+            <label for="map-bbox-details-s">S:</label>
+            <p id="map-bbox-details-s">-</p>
+            <label for="map-bbox-details-e">E:</label>
+            <p id="map-bbox-details-e">-</p>
+            <label for="map-bbox-details-n">N:</label>
+            <p id="map-bbox-details-n">-</p>
+          </div>
+        </fieldset>
+        <fieldset id="file-fieldset" class="hidden">
+          <label for="file-input">GeoTIFF file:</label>
+          <input type="file" id="file-input" accept="image/tiff" />
+        </fieldset>
+        <fieldset id="bbox-fieldset" class="hidden">
+          <label for="bbox-fields">WGS 84 bounding box:</label>
+          <div id="bbox-fields" class="grid-fields">
+            <label for="bbox-west">West:</label>
+            <input
+              type="number"
+              id="bbox-west"
+              placeholder="86.8479"
+              value="86.8479"
+              min="-180"
+              max="180"
+              step="any"
+            />
+            <label for="bbox-south">South:</label>
+            <input
+              type="number"
+              id="bbox-south"
+              placeholder="27.9222"
+              value="27.9222"
+              min="-90"
+              max="90"
+              step="any"
+            />
+            <label for="bbox-east">East:</label>
+            <input
+              type="number"
+              id="bbox-east"
+              placeholder="86.9998"
+              value="86.9998"
+              min="-180"
+              max="180"
+              step="any"
+            />
+            <label for="bbox-north">North:</label>
+            <input
+              type="number"
+              id="bbox-north"
+              placeholder="28.0531"
+              value="28.0531"
+              min="-90"
+              max="90"
+              step="any"
+            />
+          </div>
+        </fieldset>
+        <h3>Model options</h3>
+        <fieldset id="model-fieldset" class="grid-fields">
+          <label for="model-base-height">Extra base height (m):</label>
+          <input
+            type="number"
+            id="model-base-height"
+            min="0"
+            max="50000"
+            step="any"
+            placeholder="50"
+            value="50"
+            required="required"
+          />
+          <label for="model-horizontal-resolution"
+            >Horizontal resolution (m):</label
+          >
+          <input
+            type="number"
+            id="model-resolution"
+            min="1"
+            max="10000"
+            placeholder="90"
+            value="90"
+            required="required"
+            title="The distance (in metres) between each depth reading in the input data. The resolution of the STRMGL3 dataset (used by the interactive map and bounding box fields) is 90m."
+          />
+          <label for="model-x-scale">X scale factor:</label>
+          <input
+            type="number"
+            id="model-x-scale"
+            min="0.000000000000001"
+            max="100"
+            step="any"
+            placeholder="0.00001"
+            value="0.00001"
+            required="required"
+            title="The scale factor of the resulting model in the X axis. A scale factor of 1 results in a life-size model."
+          />
+          <label for="model-y-scale">Y scale factor:</label>
+          <input
+            type="number"
+            id="model-y-scale"
+            min="0.000000000000001"
+            max="100"
+            step="any"
+            placeholder="0.00001"
+            value="0.00001"
+            required="required"
+            title="The scale factor of the resulting model in the Y axis. A scale factor of 1 results in a life-size model."
+          />
+          <label for="model-z-scale">Z scale factor:</label>
+          <input
+            type="number"
+            id="model-z-scale"
+            min="0.000000000000001"
+            max="100"
+            step="any"
+            placeholder="0.00001"
+            value="0.00001"
+            required="required"
+            title="The scale factor of the resulting model in the Z axis. A scale factor of 1 results in a life-size model."
+          />
+        </fieldset>
+        <div class="loading-button-container">
+          <button type="submit">Generate 3D model</button>
+          <div id="data-loading-spinner" class="loading-spinner hidden"></div>
+        </div>
+        <div id="generation-error" class="error-container hidden">
+          <p id="generation-error-text">Error</p>
+        </div>
+      </form>
+      <div id="model" class="model"></div>
+      <div id="model-info" class="hidden">
+        <div id="model-details" class="detail-grid">
+          <label for="model-details-l">Length:</label>
+          <p id="model-details-l">-</p>
+          <label for="model-details-w">Width:</label>
+          <p id="model-details-w">-</p>
+          <label for="model-details-h">Height:</label>
+          <p id="model-details-h">-</p>
+        </div>
+        <button id="download-button" type="button">Download as STL</button>
+      </div>
+    </main>
+    <footer>
+      <hr />
+      <script src="js/generateFooterCopyright.js"></script>
+    </footer>
+  </body>
+</html>

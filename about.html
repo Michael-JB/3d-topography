@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="author" content="Michael Barlow" />
+    <meta
+      name="description"
+      content="Generate 3D-printable topographic models"
+    />
+
+    <title>3D Topography | About</title>
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="js/lib/geotiff.js/geotiff.min.js"></script>
+    <script src="js/lib/three.js/three.min.js"></script>
+    <script src="js/lib/three.js/orbitControls.min.js"></script>
+
+    <script type="module" src="js/about.js"></script>
+  </head>
+  <body>
+    <noscript>
+      <header>
+        <span>Please enable JavaScript to view this site in full.</span>
+      </header>
+    </noscript>
+    <header>
+      <h1>3D Topography</h1>
+      <nav>
+        <a href="./">Home</a>
+        <a href="about" class="selected">About</a>
+        <a href="https://github.com/Michael-JB/3d-topography/">GitHub</a>
+      </nav>
+      <hr />
+    </header>
+    <main>
+      <h3>Introduction</h3>
+      <p>
+        3D Topography is a utility to generate 3D-printable models from a global
+        digital elevation model (DEM).
+      </p>
+      <h3>Data source</h3>
+      <p>
+        The DEM can be input with a
+        <a href="https://en.wikipedia.org/wiki/GeoTIFF">GeoTIFF</a> file or a
+        latitude-longitude bounding box. If a bounding box is provided (either
+        manually or via the interactive map), a query is sent to the
+        <a href="https://opentopography.org/">OpenTopography API</a> to retrieve
+        the corresponding DEM.
+      </p>
+      <p>
+        The OpenTopography API provides an interface to a range of global raster
+        datasets. 3D Topography uses the
+        <a
+          href="https://portal.opentopography.org/raster?opentopoID=OTSRTM.042013.4326.1"
+          >SRTMGL3</a
+        >
+        DEM (<a href="https://lpdaac.usgs.gov/products/srtmgl3v003/">see also</a
+        >). This dataset covers the majority of Earth and has an approximate
+        resolution of 3 arc-seconds (i.e., depth samples are spaced ~90m apart).
+      </p>
+      <h3>How it works</h3>
+      <p>
+        3D Topography expects a DEM encoded as a 2D-array of depth values. When
+        spaced by the resolution of the dataset, this array can be visualised in
+        3D as a point cloud. 3D Topography then triangulates this point cloud
+        in-browser, generating a collection of triangles that can be rendered to
+        the screen or exported in the 3D-printable
+        <a href="https://en.wikipedia.org/wiki/STL_(file_format)">STL format</a
+        >.
+      </p>
+      <p>
+        The following is a 3D model of
+        <a href="https://en.wikipedia.org/wiki/Uluru">Uluru</a>, generated from
+        <a href="bin/uluru.tif">uluru.tif</a>. The point cloud retrieved from
+        the GeoTIFF file is shown on the left, and the corresponding
+        triangulated model is shown on the right. The base of the model is at
+        sea level.
+      </p>
+      <div class="example-model-container">
+        <div id="point-cloud-model" class="model example-model"></div>
+        <div id="triangulated-model" class="model example-model"></div>
+      </div>
+    </main>
+    <footer>
+      <hr />
+      <script src="js/generateFooterCopyright.js"></script>
+    </footer>
+  </body>
+</html>
