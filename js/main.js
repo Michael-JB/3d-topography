@@ -8,6 +8,24 @@ const surfaceAreaWarningThreshold = 1;
 const largeAreaWarningMessage =
   "Warning: your input specifies a very large area. It will take a long time to process and may fail due to resource limitations. Proceed anyway?";
 
+/*
+ * As of 2022, the OpenTopography API requires a (free) key for access to all DEM datasets. Keys aim
+ * to help the OpenTopography team better understand their traffic.
+ *
+ * I include the key here to maintain the ability to serve this site statically with GitHub Pages.
+ * If you're tempted to use the key below, I kindly request that you generate your own:
+ * OpenTopography keys can be generated and used for free. Generating your own is quick and easy
+ * (see https://opentopography.org/blog/introducing-api-keys-access-opentopography-global-datasets).
+ */
+const OTSuffix64 = [
+  "M5MjQ5Y2JhNGQ=",
+  "ZGNhODkzY2M1Nm",
+  "I1YmVhNGJmYjBl",
+  "JkFQSV9LZXk9M2",
+]
+  .reverse()
+  .join("");
+
 let currentDEM;
 let currentGeometry;
 let inputChanged = true;
@@ -90,7 +108,11 @@ const parseScaleVector = () => {
 };
 
 const composeOpenTopographyQuery = (bbox) =>
-  `https://portal.opentopography.org/API/globaldem?demtype=SRTMGL3&west=${bbox.west}&south=${bbox.south}&east=${bbox.east}&north=${bbox.north}&outputFormat=GTiff`;
+  `https://portal.opentopography.org/API/globaldem?demtype=SRTMGL3&west=${
+    bbox.west
+  }&south=${bbox.south}&east=${bbox.east}&north=${
+    bbox.north
+  }&outputFormat=GTiff${atob(OTSuffix64)}`;
 
 const queryOpenTopographyAPI = async (bbox) => {
   let dem;
